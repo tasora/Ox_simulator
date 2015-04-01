@@ -60,53 +60,84 @@ int main(int argc, char* argv[])
 
 	// HERE YOU CAN POPULATE THE PHYSICAL SYSTEM WITH BODIES AND LINKS.
 	//
-	// An example: a pendulum.
+
+	double dist_rocker_center = 2.1;
+	double rad_escapement = 1.8;
+	double thickness = 0.15;
+
+	// 1-Create the truss  
+
+	ChSharedPtr<ChBody> trussBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
+	trussBody->SetBodyFixed(true);
+
+	mphysicalSystem.Add(trussBody);
 
 
-	// 1-Create a floor that is fixed (that is used also to represent the absolute reference)
+	// 2-Create the escapement wheel 
 
-	ChSharedPtr<ChBodyEasyBox> floorBody(new ChBodyEasyBox( 10,2,10,  3000,	false, true));		//to create the floor, false -> doesn't represent a collide's surface
-	floorBody->SetPos( ChVector<>(0,-2,0) );
-	floorBody->SetBodyFixed(true);		
+	ChSharedPtr<ChBody> escapementBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
+	escapementBody->SetPos( ChVector<>(0,0,0) );	
+	escapementBody->SetWvel_loc( ChVector<>(0,0,1) ); // for example
 
-	mphysicalSystem.Add(floorBody);
+	escapementBody->SetMass(0.1); // to set
+	escapementBody->SetInertiaXX( ChVector<>(1,1,1) ); // to set
+
+	  // optional visualization
+	ChSharedPtr<ChCylinderShape> myvisual_cylinder( new ChCylinderShape);
+	myvisual_cylinder->GetCylinderGeometry().rad = rad_escapement;
+	myvisual_cylinder->GetCylinderGeometry().p1 = ChVector<>(0,0,-thickness/2);
+	myvisual_cylinder->GetCylinderGeometry().p2 = ChVector<>(0,0, thickness/2);
+	escapementBody->AddAsset(myvisual_cylinder);
+
+	mphysicalSystem.Add(escapementBody);
 
 
-	// 2-Create a pendulum 
+	// 3-Create a rocker 
 
-	ChSharedPtr<ChBodyEasyBox> pendulumBody(new ChBodyEasyBox( 0.5,2,0.5,  3000, false, true));		//to create the floor, false -> doesn't represent a collide's surface
-	pendulumBody->SetPos( ChVector<>(0, 3,0) );	
-	pendulumBody->SetPos_dt( ChVector<>(1,0,0) );
+	ChSharedPtr<ChBodyEasyBox> rockerBody(new ChBodyEasyBox( 0.5, 1.3, thickness, 2330, false, true));		//to create the floor, false -> doesn't represent a collide's surface
+	rockerBody->SetPos( ChVector<>(dist_rocker_center,0,0) );	
+	rockerBody->SetWvel_loc( ChVector<>(0,0,1.2) ); // for example
 
-	mphysicalSystem.Add(pendulumBody);
+	GetLog() << "Mass of the rocker:" << rockerBody->GetMass() << " \n";
+
+	mphysicalSystem.Add(rockerBody);
 
 
-	// 3-Create a spherical constraint. 
-	//   Here we'll use a ChLinkMateGeneric, but we could also use ChLinkLockSpherical
+	// 4- create constraint
 
-	ChSharedPtr<ChLinkMateGeneric> sphericalLink(new ChLinkMateGeneric(true,true,true, false,false,false)); // x,y,z,Rx,Ry,Rz constrains
-	ChFrame<> link_position_abs(ChVector<>(0,4,0)); 
+	ChSharedPtr<ChLinkLockRevolute> escapementLink(new ChLinkLockRevolute()); 
 
-	sphericalLink->Initialize(	pendulumBody,			// the 1st body to connect
-								floorBody,				// the 2nd body to connect
-								false,					// the two following frames are in absolute, not relative, coords. 
-								link_position_abs,		// the link reference attached to 1st body
-								link_position_abs);		// the link reference attached to 2nd body
+	ChCoordsys<> link_position_abs1(ChVector<>(0,0,0)); 
 
-	mphysicalSystem.Add(sphericalLink);
+	escapementLink->Initialize(trussBody, escapementBody, link_position_abs1);		// the link reference attached to 2nd body
 
+	mphysicalSystem.Add(escapementLink);
+
+
+	// 5- create constraint
+
+	ChSharedPtr<ChLinkLockRevolute> rockerLink(new ChLinkLockRevolute()); 
+
+	ChCoordsys<> link_position_abs2(ChVector<>(dist_rocker_center,0,0)); 
+
+	rockerLink->Initialize(trussBody, rockerBody, link_position_abs2);		// the link reference attached to 2nd body
+
+	rockerLink->GetForce_Rz()->Set_active(true);
+	rockerLink->GetForce_Rz()->Set_K(1002);
+
+	mphysicalSystem.Add(rockerLink);
 
 
 
 	// optional, attach a RGB color asset to the floor, for better visualization
 	ChSharedPtr<ChColorAsset> mcolor(new ChColorAsset());
-    mcolor->SetColor(ChColor(0.2, 0.25, 0.25));
-	floorBody->AddAsset(mcolor);		
+    mcolor->SetColor(ChColor(0.22, 0.25, 0.25));
+	rockerBody->AddAsset(mcolor);		
 
 	// optional, attach a texture to the pendulum, for better visualization
 	ChSharedPtr<ChTexture> mtexture(new ChTexture());
     mtexture->SetTextureFilename(GetChronoDataFile("cubetexture_bluwhite.png"));		//texture in ../data
-	pendulumBody->AddAsset(mtexture);		
+	escapementBody->AddAsset(mtexture);		
 
 
 
@@ -122,13 +153,20 @@ int main(int argc, char* argv[])
 
 
 	// Adjust some settings:
-	application.SetTimestep(0.005);
-	application.SetTryRealtime(true);
+	application.SetTimestep(0.001);
+	application.SetTryRealtime(false);
+
+	mphysicalSystem.SetIterLCPmaxItersSpeed(100);
+	mphysicalSystem.SetLcpSolverType(ChSystem::eCh_lcpSolver::LCP_ITERATIVE_BARZILAIBORWEIN); // or: LCP_ITERATIVE_APGD or: LCP_ITERATIVE_SOR (for speed)
+	
+	//mphysicalSystem.SetIntegrationType(ChSystem::eCh_integrationType::INT_ANITESCU); // in future: INT_HHT or other
 
 
 	// 
 	// THE SOFT-REAL-TIME CYCLE
 	//
+
+	ChStreamOutAsciiFile result_rocker("output_rocker.txt");
 
 	while (application.GetDevice()->run())
 	{
@@ -138,8 +176,15 @@ int main(int argc, char* argv[])
 
 		// This performs the integration timestep!
 		application.DoStep();
-
+		
+		// Save results:
+		result_rocker << rockerBody->GetWvel_loc().z << " " << rockerBody->GetWacc_loc().z << "\n";
+		
 		application.EndScene();
+
+		if (mphysicalSystem.GetChTime() > 2) 
+			break;
+
 	}
 
 
