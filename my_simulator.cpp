@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
 	// Create the Irrlicht visualization (open the Irrlicht device, 
 	// bind a simple user interface, etc. etc.)
-	ChIrrApp application(&mphysicalSystem, L"A simple project template",core::dimension2d<u32>(800,600),false); //screen dimensions
+	ChIrrApp application(&mphysicalSystem, L"Ox_simulator",core::dimension2d<u32>(800,600),false); //screen dimensions
 
 	// Easy shortcuts to add camera, lights, logo and sky in Irrlicht scene:
 	application.AddTypicalLogo();
@@ -61,9 +61,20 @@ int main(int argc, char* argv[])
 	// HERE YOU CAN POPULATE THE PHYSICAL SYSTEM WITH BODIES AND LINKS.
 	//
 
+	//    Consistent unit system:
+	//    - Force [uN];
+	//    - Mass [gr];
+	//    - Time [s];
+	//    - Length [mm];
+	//    - Inertia [gr*mm^2];
+	//    - Torsional stiffness [uN*m/rad];
+	//    - Torsional damping [uN*m*s/rad];
+	//    - Angular speed [rad/s].
+
 	double dist_rocker_center = 2.1;
 	double rad_escapement = 1.8;
 	double thickness = 0.15;
+	double ang_speed = (CH_C_PI)* 2;
 
 	// 1-Create the truss  
 
@@ -77,10 +88,10 @@ int main(int argc, char* argv[])
 
 	ChSharedPtr<ChBody> escapementBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
 	escapementBody->SetPos( ChVector<>(0,0,0) );	
-	escapementBody->SetWvel_loc( ChVector<>(0,0,1) ); // for example
+	escapementBody->SetWvel_loc( ChVector<>(0,0,ang_speed) ); // for example
 
-	escapementBody->SetMass(0.1); // to set
-	escapementBody->SetInertiaXX( ChVector<>(1,1,1) ); // to set
+	escapementBody->SetMass(1); // to set
+	escapementBody->SetInertiaXX( ChVector<>(1,1,0.00185) ); // to set: Jzz in [gr*mm^2]
 
 	  // optional visualization
 	ChSharedPtr<ChCylinderShape> myvisual_cylinder( new ChCylinderShape);
@@ -94,9 +105,17 @@ int main(int argc, char* argv[])
 
 	// 3-Create a rocker 
 
-	ChSharedPtr<ChBodyEasyBox> rockerBody(new ChBodyEasyBox( 0.5, 1.3, thickness, 2330, false, true));		//to create the floor, false -> doesn't represent a collide's surface
-	rockerBody->SetPos( ChVector<>(dist_rocker_center,0,0) );	
-	rockerBody->SetWvel_loc( ChVector<>(0,0,1.2) ); // for example
+	ChSharedPtr<ChBody> rockerBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
+	rockerBody->SetPos(ChVector<>(dist_rocker_center, 0, 0));
+	rockerBody->SetWvel_loc(ChVector<>(0, 0, 10)); // for example
+
+	rockerBody->SetMass(1); // to set
+	rockerBody->SetInertiaXX(ChVector<>(1, 1, 1.9837)); // to set: Jzz in [gr*mm^2]
+
+	// optional visualization
+	ChSharedPtr<ChBoxShape> myvisual_box(new ChBoxShape);
+	myvisual_box->GetBoxGeometry().Size = ChVector<>(0.2,1,thickness);
+	rockerBody->AddAsset(myvisual_box);
 
 	GetLog() << "Mass of the rocker:" << rockerBody->GetMass() << " \n";
 
@@ -109,7 +128,7 @@ int main(int argc, char* argv[])
 
 	ChCoordsys<> link_position_abs1(ChVector<>(0,0,0)); 
 
-	escapementLink->Initialize(trussBody, escapementBody, link_position_abs1);		// the link reference attached to 2nd body
+	escapementLink->Initialize(trussBody, escapementBody, link_position_abs1);		// the link reference attached to 1st body
 
 	mphysicalSystem.Add(escapementLink);
 
@@ -123,18 +142,20 @@ int main(int argc, char* argv[])
 	rockerLink->Initialize(trussBody, rockerBody, link_position_abs2);		// the link reference attached to 2nd body
 
 	rockerLink->GetForce_Rz()->Set_active(true);
-	rockerLink->GetForce_Rz()->Set_K(1002);
+	rockerLink->GetForce_Rz()->Set_K(73600); // Torsional stiffness, to set, in [uN*m/rad]
+	rockerLink->GetForce_Rz()->Set_active(true);
+	rockerLink->GetForce_Rz()->Set_R(0); // Torsional damping, to set, in [uN*m*s/rad]
 
 	mphysicalSystem.Add(rockerLink);
 
 
 
-	// optional, attach a RGB color asset to the floor, for better visualization
+	// optional, attach a RGB color asset to the rockerBody, for better visualization	
 	ChSharedPtr<ChColorAsset> mcolor(new ChColorAsset());
-    mcolor->SetColor(ChColor(0.22, 0.25, 0.25));
-	rockerBody->AddAsset(mcolor);		
+	mcolor->SetColor(ChColor(0.22, 0.25, 0.25));
+	rockerBody->AddAsset(mcolor);
 
-	// optional, attach a texture to the pendulum, for better visualization
+	// optional, attach a texture to the escapementBody, for better visualization
 	ChSharedPtr<ChTexture> mtexture(new ChTexture());
     mtexture->SetTextureFilename(GetChronoDataFile("cubetexture_bluwhite.png"));		//texture in ../data
 	escapementBody->AddAsset(mtexture);		
@@ -182,7 +203,7 @@ int main(int argc, char* argv[])
 		
 		application.EndScene();
 
-		if (mphysicalSystem.GetChTime() > 2) 
+		if (mphysicalSystem.GetChTime() > 20) 
 			break;
 
 	}
