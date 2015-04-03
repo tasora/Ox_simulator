@@ -52,8 +52,8 @@ int main(int argc, char* argv[])
 	application.AddTypicalLogo();
 	application.AddTypicalSky();
 	application.AddTypicalLights();
-	application.AddTypicalCamera(core::vector3df(2,2,-5), core::vector3df(0,1,0));		//to change the position of camera
-	//application.AddLightWithShadow(vector3df(1,25,-5), vector3df(0,0,0), 35, 0.2,35, 55, 512, video::SColorf(1,1,1));
+	application.AddTypicalCamera(core::vector3df(2,2,-5), core::vector3df(0,0,0));		//to change the position of camera
+	application.AddLightWithShadow(vector3df(1,25,-5), vector3df(0,0,0), 35, 0.2,35, 55, 512, video::SColorf(1,1,1));
  
 
 	//======================================================================
@@ -67,8 +67,8 @@ int main(int argc, char* argv[])
 	//    - Time [s];
 	//    - Length [mm];
 	//    - Inertia [gr*mm^2];
-	//    - Torsional stiffness [uN*m/rad];
-	//    - Torsional damping [uN*m*s/rad];
+	//    - Torsional stiffness [uN*mm/rad];
+	//    - Torsional damping [uN*mm*s/rad];
 	//    - Angular speed [rad/s].
 
 	double dist_rocker_center = 2.1;
@@ -78,7 +78,8 @@ int main(int argc, char* argv[])
 
 	// 1-Create the truss  
 
-	ChSharedPtr<ChBody> trussBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
+	ChSharedPtr<ChBodyEasyBox> trussBody(new ChBodyEasyBox(5,6,0.01, 1, false, true));		//to create the floor, false -> doesn't represent a collide's surface
+	trussBody->SetPos(ChVector<>(0, 0, thickness));
 	trussBody->SetBodyFixed(true);
 
 	mphysicalSystem.Add(trussBody);
@@ -88,7 +89,7 @@ int main(int argc, char* argv[])
 
 	ChSharedPtr<ChBody> escapementBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
 	escapementBody->SetPos( ChVector<>(0,0,0) );	
-	escapementBody->SetWvel_loc( ChVector<>(0,0,ang_speed) ); // for example
+	escapementBody->SetWvel_loc( ChVector<>(0,0,-ang_speed) ); // for example
 
 	escapementBody->SetMass(1); // to set
 	escapementBody->SetInertiaXX( ChVector<>(1,1,0.00185) ); // to set: Jzz in [gr*mm^2]
@@ -106,7 +107,7 @@ int main(int argc, char* argv[])
 	// 3-Create a rocker 
 
 	ChSharedPtr<ChBody> rockerBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
-	rockerBody->SetPos(ChVector<>(dist_rocker_center, 0, 0));
+	rockerBody->SetPos(ChVector<>(0, dist_rocker_center, 0));
 	rockerBody->SetWvel_loc(ChVector<>(0, 0, 10)); // for example
 
 	rockerBody->SetMass(1); // to set
@@ -114,7 +115,7 @@ int main(int argc, char* argv[])
 
 	// optional visualization
 	ChSharedPtr<ChBoxShape> myvisual_box(new ChBoxShape);
-	myvisual_box->GetBoxGeometry().Size = ChVector<>(0.2,1,thickness);
+	myvisual_box->GetBoxGeometry().Size = ChVector<>(1,0.2,thickness);
 	rockerBody->AddAsset(myvisual_box);
 
 	GetLog() << "Mass of the rocker:" << rockerBody->GetMass() << " \n";
@@ -137,18 +138,21 @@ int main(int argc, char* argv[])
 
 	ChSharedPtr<ChLinkLockRevolute> rockerLink(new ChLinkLockRevolute()); 
 
-	ChCoordsys<> link_position_abs2(ChVector<>(dist_rocker_center,0,0)); 
+	ChCoordsys<> link_position_abs2(ChVector<>(0, dist_rocker_center, 0));
 
 	rockerLink->Initialize(trussBody, rockerBody, link_position_abs2);		// the link reference attached to 2nd body
 
 	rockerLink->GetForce_Rz()->Set_active(true);
-	rockerLink->GetForce_Rz()->Set_K(73600); // Torsional stiffness, to set, in [uN*m/rad]
+	rockerLink->GetForce_Rz()->Set_K(73600); // Torsional stiffness, to set, in [uN*mm/rad]
 	rockerLink->GetForce_Rz()->Set_active(true);
-	rockerLink->GetForce_Rz()->Set_R(0); // Torsional damping, to set, in [uN*m*s/rad]
+	rockerLink->GetForce_Rz()->Set_R(0); // Torsional damping, to set, in [uN*mm*s/rad]
 
 	mphysicalSystem.Add(rockerLink);
 
-
+	// optional, attach a RGB color asset to the trussBody, for better visualization	
+	ChSharedPtr<ChColorAsset> acolor(new ChColorAsset());
+	acolor->SetColor(ChColor(0.55, 0.1, 0));
+	trussBody->AddAsset(acolor);
 
 	// optional, attach a RGB color asset to the rockerBody, for better visualization	
 	ChSharedPtr<ChColorAsset> mcolor(new ChColorAsset());
