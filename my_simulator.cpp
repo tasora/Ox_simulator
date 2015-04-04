@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 	application.AddTypicalSky();
 	application.AddTypicalLights();
 	application.AddTypicalCamera(core::vector3df(2,2,-5), core::vector3df(0,0,0));		//to change the position of camera
-	application.AddLightWithShadow(vector3df(1,25,-5), vector3df(0,0,0), 35, 0.2,35, 55, 512, video::SColorf(1,1,1));
+    application.AddLightWithShadow(vector3df(1,25,-5), vector3df(0,0,0), 35, 0.2,35, 55, 512, video::SColorf(1,1,1));
  
 
 	//======================================================================
@@ -69,6 +69,7 @@ int main(int argc, char* argv[])
 	//    - Inertia [gr*mm^2];
 	//    - Torsional stiffness [uN*mm/rad];
 	//    - Torsional damping [uN*mm*s/rad];
+	//    - Torque [uN*mm];
 	//    - Angular speed [rad/s].
 
 	double dist_rocker_center = 2.1;
@@ -78,7 +79,7 @@ int main(int argc, char* argv[])
 
 	// 1-Create the truss  
 
-	ChSharedPtr<ChBodyEasyBox> trussBody(new ChBodyEasyBox(5,6,0.01, 1, false, true));		//to create the floor, false -> doesn't represent a collide's surface
+	ChSharedPtr<ChBodyEasyBox> trussBody(new ChBodyEasyBox(6,7,0.01, 1, false, true));		//to create the floor, false -> doesn't represent a collide's surface
 	trussBody->SetPos(ChVector<>(0, 0, thickness));
 	trussBody->SetBodyFixed(true);
 
@@ -88,18 +89,19 @@ int main(int argc, char* argv[])
 	// 2-Create the escapement wheel 
 
 	ChSharedPtr<ChBody> escapementBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
-	escapementBody->SetPos( ChVector<>(0,0,0) );	
-	escapementBody->SetWvel_loc( ChVector<>(0,0,-ang_speed) ); // for example
+	escapementBody->SetPos(ChVector<>(0, 0, 0));
+	//escapementBody->SetWvel_loc(ChVector<>(0, 0, -ang_speed)); // for example
+	escapementBody->Set_Scr_torque(ChVector<>(0, 0, -37.91)); // constant torque to eascape wheel [uN*mm]
 
 	escapementBody->SetMass(1); // to set
-	escapementBody->SetInertiaXX( ChVector<>(1,1,0.00185) ); // to set: Jzz in [gr*mm^2]
+	escapementBody->SetInertiaXX( ChVector<>(1, 1, 0.00185) ); // to set: Jzz in [gr*mm^2]
 
 	// Collision shape of the escapementBody
 
-	//escapementBody->GetCollisionModel()->ClearModel();
-	//escapementBody->GetCollisionModel()->AddConvexHull();
-	//escapementBody->GetCollisionModel()->BuildModel();
-	//escapementBody->SetCollide(true)
+	escapementBody->GetCollisionModel()->ClearModel();
+	escapementBody->GetCollisionModel()->AddCylinder(rad_escapement, rad_escapement, thickness, ChVector<>(0, 0, 0), (ChMatrix33<>(-CH_C_PI/2, ChVector<>(1,0,0))));
+	escapementBody->GetCollisionModel()->BuildModel();
+	escapementBody->SetCollide(true);
 
 	// optional visualization
 	ChSharedPtr<ChCylinderShape> myvisual_cylinder( new ChCylinderShape);
@@ -115,21 +117,21 @@ int main(int argc, char* argv[])
 
 	ChSharedPtr<ChBody> rockerBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
 	rockerBody->SetPos(ChVector<>(0, dist_rocker_center, 0));
-	rockerBody->SetWvel_loc(ChVector<>(0, 0, 10)); // for example
+	rockerBody->SetWvel_loc(ChVector<>(0, 0, -50)); // for example
 
 	rockerBody->SetMass(1); // to set
 	rockerBody->SetInertiaXX(ChVector<>(1, 1, 1.9837)); // to set: Jzz in [gr*mm^2]
 
 	// Collision shape of the rockerBody
 
-	//rockerBody->GetCollisionModel()->ClearModel();
-	//rockerBody->GetCollisionModel()->AddConvexHull();
-	//rockerBody->GetCollisionModel()->BuildModel();
-	//rockerBody->SetCollide(true)
+	rockerBody->GetCollisionModel()->ClearModel();
+	rockerBody->GetCollisionModel()->AddBox(1, 0.2, thickness, ChVector<>(0, 0, 0));
+	rockerBody->GetCollisionModel()->BuildModel();
+	rockerBody->SetCollide(true);
 
 	// optional visualization
 	ChSharedPtr<ChBoxShape> myvisual_box(new ChBoxShape);
-	myvisual_box->GetBoxGeometry().Size = ChVector<>(1,0.2,thickness);
+	myvisual_box->GetBoxGeometry().Size = ChVector<>(1, 0.2, thickness);
 	rockerBody->AddAsset(myvisual_box);
 
 	GetLog() << "Mass of the rocker:" << rockerBody->GetMass() << " \n";
@@ -176,9 +178,8 @@ int main(int argc, char* argv[])
 
 	// optional, attach a texture to the escapementBody, for better visualization
 	ChSharedPtr<ChTexture> mtexture(new ChTexture());
-    mtexture->SetTextureFilename(GetChronoDataFile("cubetexture_bluwhite.png"));		//texture in ../data
+    mtexture->SetTextureFilename(GetChronoDataFile("escape_wheel.png"));		//texture in ../data
 	escapementBody->AddAsset(mtexture);		
-
 
 
 	//======================================================================
