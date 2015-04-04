@@ -94,7 +94,14 @@ int main(int argc, char* argv[])
 	escapementBody->SetMass(1); // to set
 	escapementBody->SetInertiaXX( ChVector<>(1,1,0.00185) ); // to set: Jzz in [gr*mm^2]
 
-	  // optional visualization
+	// Collision shape of the escapementBody
+
+	//escapementBody->GetCollisionModel()->ClearModel();
+	//escapementBody->GetCollisionModel()->AddConvexHull();
+	//escapementBody->GetCollisionModel()->BuildModel();
+	//escapementBody->SetCollide(true)
+
+	// optional visualization
 	ChSharedPtr<ChCylinderShape> myvisual_cylinder( new ChCylinderShape);
 	myvisual_cylinder->GetCylinderGeometry().rad = rad_escapement;
 	myvisual_cylinder->GetCylinderGeometry().p1 = ChVector<>(0,0,-thickness/2);
@@ -112,6 +119,13 @@ int main(int argc, char* argv[])
 
 	rockerBody->SetMass(1); // to set
 	rockerBody->SetInertiaXX(ChVector<>(1, 1, 1.9837)); // to set: Jzz in [gr*mm^2]
+
+	// Collision shape of the rockerBody
+
+	//rockerBody->GetCollisionModel()->ClearModel();
+	//rockerBody->GetCollisionModel()->AddConvexHull();
+	//rockerBody->GetCollisionModel()->BuildModel();
+	//rockerBody->SetCollide(true)
 
 	// optional visualization
 	ChSharedPtr<ChBoxShape> myvisual_box(new ChBoxShape);
@@ -148,6 +162,7 @@ int main(int argc, char* argv[])
 	rockerLink->GetForce_Rz()->Set_R(0); // Torsional damping, to set, in [uN*mm*s/rad]
 
 	mphysicalSystem.Add(rockerLink);
+
 
 	// optional, attach a RGB color asset to the trussBody, for better visualization	
 	ChSharedPtr<ChColorAsset> acolor(new ChColorAsset());
