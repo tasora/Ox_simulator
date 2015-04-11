@@ -85,10 +85,14 @@ int main(int argc, char* argv[])
 
 	mphysicalSystem.Add(trussBody);
 
+	ChSharedPtr<ChBodyEasyConvexHull> convexhullBody(new ChBodyEasyConvexHull(std::vector < ChVector<> > {{-0.1, 0, -0.075}, { -0.05, 1.8, -0.075 }, { 0.05, 1.8, -0.075 }, { 0.1, 0, -0.075 }, { -0.1, 0, 0.075 }, { -0.05, 1.8, 0.075 }, { 0.05, 1.8, 0.075 }, { 0.1, 0, 0.075 }}, 0, false, true));		//to create the floor, false -> doesn't represent a collide's surface
+	convexhullBody->SetPos(ChVector<>(0, 0, 0));
+	convexhullBody->SetBodyFixed(true);
+
+	mphysicalSystem.Add(convexhullBody);
+
 
 	// 2-Create the escapement wheel 
-
-	//mphysicalSystem.Add(ConvexHullBody);
 
 	ChSharedPtr<ChBody> escapementBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
 	escapementBody->SetPos(ChVector<>(0, 0, 0));
@@ -105,17 +109,17 @@ int main(int argc, char* argv[])
 	//escapementBody->GetCollisionModel()->BuildModel();
 	//escapementBody->SetCollide(true);
 
-	escapementBody->GetCollisionModel()->ClearModel();
-	escapementBody->GetCollisionModel()->AddConvexHull(std::vector<ChVector<double> >(), ChVector<>(0, 0, 0));
-	escapementBody->GetCollisionModel()->BuildModel();
-	escapementBody->SetCollide(true);
+	//escapementBody->GetCollisionModel()->ClearModel();
+	//escapementBody->GetCollisionModel()->AddConvexHull(std::vector<ChVector<>> {(-0.1, 0, -0.15), (-0.1, 1.8, -0.15), (0.1, 1.8, -0.15), (0.1, 0, -0.15), (-0.1, 0, 0.15), (-0.1, 1.8, 0.15), (0.1, 1.8, 0.15), (0.1, 0, 0.15)}, ChVector<>(0, 2, 0));
+	//escapementBody->GetCollisionModel()->BuildModel();
+	//escapementBody->SetCollide(true);
 
 	// optional visualization
 	ChSharedPtr<ChCylinderShape> myvisual_cylinder( new ChCylinderShape);
 	myvisual_cylinder->GetCylinderGeometry().rad = rad_escapement;
 	myvisual_cylinder->GetCylinderGeometry().p1 = ChVector<>(0,0,-thickness/2);
 	myvisual_cylinder->GetCylinderGeometry().p2 = ChVector<>(0,0, thickness/2);
-	escapementBody->AddAsset(myvisual_cylinder);
+	escapementBody->AddAsset(myvisual_cylinder); 
 
 	mphysicalSystem.Add(escapementBody);
 
@@ -141,7 +145,7 @@ int main(int argc, char* argv[])
 	myvisual_box->GetBoxGeometry().Size = ChVector<>(1, 0.2, thickness);
 	rockerBody->AddAsset(myvisual_box);
 
-	GetLog() << "Mass of the rocker:" << rockerBody->GetMass() << " \n";
+	//GetLog() << "Mass of the rocker:" << rockerBody->GetMass() << " \n";
 
 	mphysicalSystem.Add(rockerBody);
 
