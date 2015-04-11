@@ -13,20 +13,20 @@
 // A very simple example that can be used as template project for 
 // a Chrono::Engine simulator with 3D view.
  
-   
- 
+
 #include "physics/ChSystem.h"
 #include "physics/ChBodyEasy.h"
 #include "physics/ChLinkMate.h"
 #include "assets/ChTexture.h"
 #include "assets/ChColorAsset.h"
 #include "unit_IRRLICHT/ChIrrApp.h"
- 
+#include "physics/ChBody.h"
 
 
 // Use the namespace of Chrono
 
 using namespace chrono;
+
 
 // Use the main namespaces of Irrlicht
 
@@ -88,6 +88,8 @@ int main(int argc, char* argv[])
 
 	// 2-Create the escapement wheel 
 
+	//mphysicalSystem.Add(ConvexHullBody);
+
 	ChSharedPtr<ChBody> escapementBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
 	escapementBody->SetPos(ChVector<>(0, 0, 0));
 	//escapementBody->SetWvel_loc(ChVector<>(0, 0, -ang_speed)); // for example
@@ -98,8 +100,13 @@ int main(int argc, char* argv[])
 
 	// Collision shape of the escapementBody
 
+	//escapementBody->GetCollisionModel()->ClearModel();
+	//escapementBody->GetCollisionModel()->AddCylinder(rad_escapement, rad_escapement, thickness, ChVector<>(0, 0, 0), (ChMatrix33<>(-CH_C_PI/2, ChVector<>(1,0,0))));
+	//escapementBody->GetCollisionModel()->BuildModel();
+	//escapementBody->SetCollide(true);
+
 	escapementBody->GetCollisionModel()->ClearModel();
-	escapementBody->GetCollisionModel()->AddCylinder(rad_escapement, rad_escapement, thickness, ChVector<>(0, 0, 0), (ChMatrix33<>(-CH_C_PI/2, ChVector<>(1,0,0))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector<ChVector<double> >(), ChVector<>(0, 0, 0));
 	escapementBody->GetCollisionModel()->BuildModel();
 	escapementBody->SetCollide(true);
 
