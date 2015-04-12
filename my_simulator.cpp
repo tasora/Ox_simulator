@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 	//    - Torque [uN*mm];
 	//    - Angular speed [rad/s].
 
-	double dist_rocker_center = 2.1;
+	double dist_rocker_center = 2.17;
 	double rad_escapement = 1.8;
 	double thickness = 0.15;
 	double ang_speed = (CH_C_PI)* 2;
@@ -84,12 +84,6 @@ int main(int argc, char* argv[])
 	trussBody->SetBodyFixed(true);
 
 	mphysicalSystem.Add(trussBody);
-
-	ChSharedPtr<ChBodyEasyConvexHull> convexhullBody(new ChBodyEasyConvexHull(std::vector < ChVector<> > {{-0.1, 0, -0.075}, { -0.05, 1.8, -0.075 }, { 0.05, 1.8, -0.075 }, { 0.1, 0, -0.075 }, { -0.1, 0, 0.075 }, { -0.05, 1.8, 0.075 }, { 0.05, 1.8, 0.075 }, { 0.1, 0, 0.075 }}, 0, false, true));		//to create the floor, false -> doesn't represent a collide's surface
-	convexhullBody->SetPos(ChVector<>(0, 0, 0));
-	convexhullBody->SetBodyFixed(true);
-
-	mphysicalSystem.Add(convexhullBody);
 
 
 	// 2-Create the escapement wheel 
@@ -104,15 +98,159 @@ int main(int argc, char* argv[])
 
 	// Collision shape of the escapementBody
 
-	//escapementBody->GetCollisionModel()->ClearModel();
-	//escapementBody->GetCollisionModel()->AddCylinder(rad_escapement, rad_escapement, thickness, ChVector<>(0, 0, 0), (ChMatrix33<>(-CH_C_PI/2, ChVector<>(1,0,0))));
-	//escapementBody->GetCollisionModel()->BuildModel();
-	//escapementBody->SetCollide(true);
-
-	//escapementBody->GetCollisionModel()->ClearModel();
-	//escapementBody->GetCollisionModel()->AddConvexHull(std::vector<ChVector<>> {(-0.1, 0, -0.15), (-0.1, 1.8, -0.15), (0.1, 1.8, -0.15), (0.1, 0, -0.15), (-0.1, 0, 0.15), (-0.1, 1.8, 0.15), (0.1, 1.8, 0.15), (0.1, 0, 0.15)}, ChVector<>(0, 2, 0));
-	//escapementBody->GetCollisionModel()->BuildModel();
-	//escapementBody->SetCollide(true);
+	escapementBody->GetCollisionModel()->ClearModel();
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> > 
+	{
+	{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 }, 
+	{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(CH_C_2PI/30, ChVector<>(0,0,1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(2*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(3*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(4*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(5*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(6*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(7*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(8*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(9*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(10*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(11*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(12*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(13*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(14*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(15*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(16*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(17*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(18*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(19*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(20*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(21*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(22*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(23*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(24*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(25*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(26*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(27*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(28*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{-1.7012, -0.0374, -thickness / 2}, { -1.8998, 0.0296, -thickness / 2 }, { -1.8994, 0.0486, -thickness / 2 }, { -1.8990, 0.0439, -thickness / 2 }, { -1.8983, 0.0495, -thickness / 2 }, { -1.7077, 0.0273, -thickness / 2 },
+		{ -1.7012, -0.0374, thickness / 2 }, { -1.8998, 0.0296, thickness / 2 }, { -1.8994, 0.0486, thickness / 2 }, { -1.8990, 0.0439, thickness / 2 }, { -1.8983, 0.0495, thickness / 2 }, { -1.7077, 0.0273, thickness / 2 }
+	}, ChVector<>(0, 0, 0), (ChMatrix33<>(29*CH_C_2PI / 30, ChVector<>(0, 0, 1))));
+	escapementBody->GetCollisionModel()->BuildModel();
+	escapementBody->SetCollide(true);
 
 	// optional visualization
 	ChSharedPtr<ChCylinderShape> myvisual_cylinder( new ChCylinderShape);
@@ -136,9 +274,22 @@ int main(int argc, char* argv[])
 	// Collision shape of the rockerBody
 
 	rockerBody->GetCollisionModel()->ClearModel();
-	rockerBody->GetCollisionModel()->AddBox(1, 0.2, thickness, ChVector<>(0, 0, 0));
-	rockerBody->GetCollisionModel()->BuildModel();
-	rockerBody->SetCollide(true);
+	rockerBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> >
+	{
+		{ -0.9853, -0.5631, -thickness / 2}, { -1.0787, -0.5997, -thickness / 2 }, { -1.0885, -0.5816, -thickness / 2 }, { -1.0986, -0.5623, -thickness / 2 }, { -1.1079, -0.5438, -thickness / 2 },
+		{ -1.1169, -0.5250, -thickness / 2 }, { -1.1257, -0.5060, -thickness / 2 }, { -1.1342, -0.4867, -thickness / 2 }, { -1.1423, -0.4671, -thickness / 2 }, { -1.1502, -0.4473, -thickness / 2 },
+		{ -1.1579, -0.4272, -thickness / 2 }, { -1.1652, -0.4069, -thickness / 2 }, { -1.1722, -0.3863, -thickness / 2 }, { -1.1788, -0.3654, -thickness / 2 }, { -1.1863, -0.3402, -thickness / 2 },
+		{ -0.9853, -0.5631, thickness / 2 }, { -1.0787, -0.5997, thickness / 2 }, { -1.0885, -0.5816, thickness / 2 }, { -1.0986, -0.5623, thickness / 2 }, { -1.1079, -0.5438, thickness / 2 },
+		{ -1.1169, -0.5250, thickness / 2 }, { -1.1257, -0.5060, thickness / 2 }, { -1.1342, -0.4867, thickness / 2 }, { -1.1423, -0.4671, thickness / 2 }, { -1.1502, -0.4473, thickness / 2 },
+		{ -1.1579, -0.4272, thickness / 2 }, { -1.1652, -0.4069, thickness / 2 }, { -1.1722, -0.3863, thickness / 2 }, { -1.1788, -0.3654, thickness / 2 }, { -1.1863, -0.3402, thickness / 2 },
+	}, ChVector<>(0, 0, 0));
+		rockerBody->GetCollisionModel()->BuildModel();
+		rockerBody->SetCollide(true);
+
+	//rockerBody->GetCollisionModel()->ClearModel();
+	//rockerBody->GetCollisionModel()->AddBox(1, 0.2, thickness, ChVector<>(0, 0, 0));
+	//rockerBody->GetCollisionModel()->BuildModel();
+	//rockerBody->SetCollide(true);
 
 	// optional visualization
 	ChSharedPtr<ChBoxShape> myvisual_box(new ChBoxShape);
