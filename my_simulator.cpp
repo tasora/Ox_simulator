@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 	ChSharedPtr<ChBody> escapementBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
 	escapementBody->SetPos(ChVector<>(0, 0, 0));
 	//escapementBody->SetWvel_loc(ChVector<>(0, 0, -ang_speed)); // for example
-	escapementBody->Set_Scr_torque(ChVector<>(0, 0, 1.5*-37.91)); // constant torque to eascape wheel [uN*mm]
+	escapementBody->Set_Scr_torque(ChVector<>(0, 0, 25*-37.91)); // constant torque to eascape wheel [uN*mm]
 
 	escapementBody->GetMaterialSurface()->SetFriction(0.0);
 
@@ -158,12 +158,14 @@ int main(int argc, char* argv[])
 
 	// Collision shape of the rockerBody
 
+	// modifica ultimo punto rockerL: (originale, spigolo paletta interno sx) { -1.1779, -1.0623, -thickness }
+
 	std::vector < ChVector<> > points_rockerL = {
 			{ -1.2886, -1.1450, -thickness}, { -1.3018, -1.1300, -thickness}, { -1.3148, -1.1149, -thickness}, { -1.3276, -1.0996, -thickness}, { -1.3402, -1.0842, -thickness},
 			{ -1.3526, -1.0686, -thickness}, { -1.3649, -1.0529, -thickness}, { -1.3770, -1.0371, -thickness}, { -1.3889, -1.0211, -thickness}, { -1.4006, -1.0050, -thickness},
 			{ -1.4121, -0.9887, -thickness}, { -1.4234, -0.9723, -thickness}, { -1.4346, -0.9558, -thickness}, { -1.4455, -0.9391, -thickness}, { -1.4563, -0.9223, -thickness},
 			{ -1.4669, -0.9054, -thickness}, { -1.4773, -0.8883, -thickness}, { -1.4875, -0.8711, -thickness}, { -1.4976, -0.8537, -thickness}, { -1.5074, -0.8362, -thickness},
-			{ -1.5171, -0.8185, -thickness }, { -1.4458, -0.7653, -thickness }, { -1.1779, -1.0623, -thickness }, { -1.2886, -1.1450, thickness }, { -1.3018, -1.1300, thickness }, 
+			{ -1.5171, -0.8185, -thickness }, { -1.4458, -0.7653, -thickness }, { -1.1779, -1.0623, -thickness }, { -1.2886, -1.1450, thickness }, { -1.3018, -1.1300, thickness },
 			{ -1.3148, -1.1149, thickness }, { -1.3276, -1.0996, thickness }, { -1.3402, -1.0842, thickness },
 			{ -1.3526, -1.0686, thickness }, { -1.3649, -1.0529, thickness }, { -1.3770, -1.0371, thickness }, { -1.3889, -1.0211, thickness }, { -1.4006, -1.0050, thickness },
 			{ -1.4121, -0.9887, thickness }, { -1.4234, -0.9723, thickness }, { -1.4346, -0.9558, thickness }, { -1.4455, -0.9391, thickness }, { -1.4563, -0.9223, thickness },
@@ -323,10 +325,6 @@ int main(int argc, char* argv[])
 	lhR15.ComputeHull(points_rockerR15, vshapeR15->GetMesh());
 	rockerBody->AddAsset(vshapeR15);
 
-	//rockerBody->GetCollisionModel()->ClearModel();
-	//rockerBody->GetCollisionModel()->AddBox(1, 0.2, thickness, ChVector<>(0, 0, 0));
-	//rockerBody->GetCollisionModel()->BuildModel();
-	//rockerBody->SetCollide(true);
 
 	// optional visualization
 	ChSharedPtr<ChBoxShape> myvisual_box(new ChBoxShape);
@@ -395,7 +393,7 @@ int main(int argc, char* argv[])
 	// Adjust some settings:
 	application.SetTimestep(0.00001);
 	application.SetTryRealtime(false);
-	//application.SetVideoframeSaveInterval(10);
+	application.SetVideoframeSaveInterval(20);
 
 	mphysicalSystem.SetIterLCPmaxItersSpeed(100);
 	mphysicalSystem.SetLcpSolverType(ChSystem::eCh_lcpSolver::LCP_ITERATIVE_BARZILAIBORWEIN); // or: LCP_ITERATIVE_APGD or: LCP_ITERATIVE_SOR (for speed)
@@ -407,7 +405,12 @@ int main(int argc, char* argv[])
 	// THE SOFT-REAL-TIME CYCLE
 	//
 
-	ChStreamOutAsciiFile result_rocker("output_rocker.txt");
+	ChStreamOutAsciiFile result_rocker_Theta("output_rocker_Theta.txt");
+	ChStreamOutAsciiFile result_rocker_ThetaP("output_rocker_ThetaP.txt");
+	ChStreamOutAsciiFile result_rocker_ThetaPP("output_rocker_ThetaPP.txt");
+	ChStreamOutAsciiFile result_wheel_Theta("output_wheel_Theta.txt");
+	ChStreamOutAsciiFile result_wheel_ThetaP("output_wheel_ThetaP.txt");
+	ChStreamOutAsciiFile result_wheel_ThetaPP("output_wheel_ThetaPP.txt");
 
 	while (application.GetDevice()->run())
 	{
@@ -420,11 +423,17 @@ int main(int argc, char* argv[])
 		application.DoStep();
 		
 		// Save results:
-		result_rocker << rockerBody->GetWvel_loc().z << " " << rockerBody->GetWacc_loc().z << "\n";
+		result_rocker_Theta << rockerBody->GetRotAngle() << "\n";
+		result_rocker_ThetaP << rockerBody->GetWvel_loc().z << "\n";
+		result_rocker_ThetaPP << rockerBody->GetWacc_loc().z << "\n";
+
+		result_wheel_Theta << escapementBody->GetRotAngle() << "\n";
+		result_wheel_ThetaP << escapementBody->GetWvel_loc().z << "\n";
+		result_wheel_ThetaPP << escapementBody->GetWacc_loc().z << "\n";
 		
 		application.EndScene();
 
-		if (mphysicalSystem.GetChTime() > 20) 
+		if (mphysicalSystem.GetChTime() > 0.1) 
 			break;
 
 	}
