@@ -21,7 +21,7 @@
 #include "assets/ChColorAsset.h"
 #include "unit_IRRLICHT/ChIrrApp.h"
 #include "physics/ChBody.h"
-
+#include "physics/ChContactContainer.h"
 
 // Use the namespace of Chrono
 
@@ -401,6 +401,54 @@ int main(int argc, char* argv[])
 	//mphysicalSystem.SetIntegrationType(ChSystem::eCh_integrationType::INT_ANITESCU); // in future: INT_HHT or other
 
 
+    // This is the contact reporter class
+    class _contact_reporter_class : public  chrono::ChReportContactCallback 
+    {
+        public:
+        ChStreamOutAsciiFile* mfile; // the file to save data into
+        double mtime;
+        int mstep;
+
+        virtual bool ReportContactCallback(const chrono::ChVector<>& pA,
+                                           const chrono::ChVector<>& pB,
+                                           const chrono::ChMatrix33<>& plane_coord,
+                                           const double& distance,
+                                           const float& mfriction,
+                                           const chrono::ChVector<>& react_forces,
+                                           const chrono::ChVector<>& react_torques,
+                                           chrono::collision::ChCollisionModel* modA,
+                                           chrono::collision::ChCollisionModel* modB) 
+        {
+            // For each contact, this function is executed. 
+            // In this example, saves on ascii file:
+            //  step, time,  position xyz, direction xyz, normal impulse, modelA ID, modelB ID information is saved. 
+            (*mfile) <<  mstep << " "
+                     <<  mtime << " " 
+                     << pA.x << " " 
+                     << pA.y << " " 
+                     << pA.z << " " 
+                     << plane_coord.Get_A_Xaxis().x << " "
+                     << plane_coord.Get_A_Xaxis().y << " "
+                     << plane_coord.Get_A_Xaxis().z << " "
+                     << react_forces.x << " "
+                     << modA->GetPhysicsItem()->GetIdentifier() << " "
+                     << modB->GetPhysicsItem()->GetIdentifier() << "\n";
+
+            return true;  // to continue scanning contacts
+        }
+    };
+
+
+    // The following will enable the 'contact reporting' feature, that is the ReportContactCallback() above 
+    // will be executed for each contact. 
+
+    _contact_reporter_class my_contact_rep;
+
+    ChStreamOutAsciiFile result_contacts("contacts.txt");
+    my_contact_rep.mfile = &result_contacts;
+    my_contact_rep.mtime = 0;
+    my_contact_rep.mstep = 0;
+
 	// 
 	// THE SOFT-REAL-TIME CYCLE
 	//
@@ -431,6 +479,11 @@ int main(int argc, char* argv[])
 		result_wheel_ThetaP << escapementBody->GetWvel_loc().z << "\n";
 		result_wheel_ThetaPP << escapementBody->GetWacc_loc().z << "\n";
 		
+        // Save contacts:
+        my_contact_rep.mtime = mphysicalSystem.GetChTime();
+        my_contact_rep.mstep++;
+        mphysicalSystem.GetContactContainer()->ReportAllContacts(&my_contact_rep);
+
 		application.EndScene();
 
 		if (mphysicalSystem.GetChTime() > 0.1) 
