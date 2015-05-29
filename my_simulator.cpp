@@ -73,9 +73,9 @@ int main(int argc, char* argv[])
 	//    - Torque [uN*mm];
 	//    - Angular speed [rad/s].
 
-	// SCAPPAMENTO 2 NEW
+	// SCAPPAMENTO 3 NEW
 
-	double dist_rocker_center = 2.2662;
+	double dist_rocker_center = 2.0285;
 	double thickness = 0.15;
 	double ang_speed = (CH_C_PI)* 2;
 	// braccio piano di impulso - COG rocker
@@ -95,12 +95,12 @@ int main(int argc, char* argv[])
 	ChSharedPtr<ChBody> escapementBody(new ChBody());		//to create the floor, false -> doesn't represent a collide's surface
 	escapementBody->SetPos(ChVector<>(0, 0, 0));
 	//escapementBody->SetWvel_loc(ChVector<>(0, 0, -ang_speed)); // for example
-	escapementBody->Set_Scr_torque(ChVector<>(0, 0, 2*-37.91)); // constant torque to eascape wheel [uN*mm]
+	escapementBody->Set_Scr_torque(ChVector<>(0, 0, -10*37.91)); // constant torque to eascape wheel [uN*mm] (1° tentativo: 37.91 uNmm--->0.0038654 gmm; 2° tentativo: 49.035 uNmm--->0.005 gmm)
 
-	escapementBody->GetMaterialSurface()->SetFriction(0.1);
+	escapementBody->GetMaterialSurface()->SetFriction(0.1); // Escapement wheel's COF
 
 	escapementBody->SetMass(1); // to set
-	escapementBody->SetInertiaXX( ChVector<>(1, 1, 0.00123) ); // to set: Jzz in [gr*mm^2]
+	escapementBody->SetInertiaXX( ChVector<>(1, 1, 0.00130) ); // to set: Jzz in [gr*mm^2]
 
 	// Collision shape of the escapementBody
 
@@ -113,8 +113,8 @@ int main(int argc, char* argv[])
 	{
 		escapementBody->GetCollisionModel()->AddConvexHull(std::vector < ChVector<> > 
 		{
-			{-0.79705, 1.12201, -thickness / 2}, { -0.78825, 1.44954, -thickness / 2 }, { -0.77692, 1.45564, -thickness / 2 }, { -0.77605, 1.45588, -thickness / 2 }, { -0.77529, 1.45576, -thickness / 2 }, { -0.77457, 1.4553, -thickness / 2 }, { -0.77412, 1.45463, -thickness / 2 }, { -0.67397, 1.20773, -thickness / 2 },
-			{ -0.79705, 1.12201, thickness / 2 }, { -0.78825, 1.44954, thickness / 2 }, { -0.77692, 1.45564, thickness / 2 }, { -0.77605, 1.45588, thickness / 2 }, { -0.77529, 1.45576, thickness / 2 }, { -0.77457, 1.4553, thickness / 2 }, { -0.77412, 1.45463, thickness / 2 }, { -0.67397, 1.20773, thickness / 2 }
+			{-0.68128, 1.25294, -thickness / 2}, { -0.60034, 1.5369, -thickness / 2 }, { -0.58834, 1.54154, -thickness / 2 }, { -0.58745, 1.54166, -thickness / 2 }, { -0.58672, 1.54145, -thickness / 2 }, { -0.58606, 1.5409, -thickness / 2 }, { -0.5857, 1.54017, -thickness / 2 }, { -0.5314, 1.331, -thickness / 2 },
+			{ -0.68128, 1.25294, thickness / 2 }, { -0.60034, 1.5369, thickness / 2 }, { -0.58834, 1.54154, thickness / 2 }, { -0.58745, 1.54166, thickness / 2 }, { -0.58672, 1.54145, thickness / 2 }, { -0.58606, 1.5409, thickness / 2 }, { -0.5857, 1.54017, thickness / 2 }, { -0.5314, 1.331, thickness / 2 }
 		}, ChVector<>(0, 0, 0), (ChMatrix33<>(i * CH_C_2PI / num_escapements, ChVector<>(0, 0, 1)) ));
 	}
 	escapementBody->GetCollisionModel()->BuildModel();
@@ -126,8 +126,8 @@ int main(int argc, char* argv[])
 	{
 		std::vector < ChVector<> >   points = 
 		{
-			{ -0.79705, 1.12201, -thickness / 2 }, { -0.78825, 1.44954, -thickness / 2 }, { -0.77692, 1.45564, -thickness / 2 }, { -0.77605, 1.45588, -thickness / 2 }, { -0.77529, 1.45576, -thickness / 2 }, { -0.77457, 1.4553, -thickness / 2 }, { -0.77412, 1.45463, -thickness / 2 }, { -0.67397, 1.20773, -thickness / 2 },
-			{ -0.79705, 1.12201, thickness / 2 }, { -0.78825, 1.44954, thickness / 2 }, { -0.77692, 1.45564, thickness / 2 }, { -0.77605, 1.45588, thickness / 2 }, { -0.77529, 1.45576, thickness / 2 }, { -0.77457, 1.4553, thickness / 2 }, { -0.77412, 1.45463, thickness / 2 }, { -0.67397, 1.20773, thickness / 2 }
+			{ -0.68128, 1.25294, -thickness / 2 }, { -0.60034, 1.5369, -thickness / 2 }, { -0.58834, 1.54154, -thickness / 2 }, { -0.58745, 1.54166, -thickness / 2 }, { -0.58672, 1.54145, -thickness / 2 }, { -0.58606, 1.5409, -thickness / 2 }, { -0.5857, 1.54017, -thickness / 2 }, { -0.5314, 1.331, -thickness / 2 },
+			{ -0.68128, 1.25294, thickness / 2 }, { -0.60034, 1.5369, thickness / 2 }, { -0.58834, 1.54154, thickness / 2 }, { -0.58745, 1.54166, thickness / 2 }, { -0.58672, 1.54145, thickness / 2 }, { -0.58606, 1.5409, thickness / 2 }, { -0.5857, 1.54017, thickness / 2 }, { -0.5314, 1.331, thickness / 2 }
 		};
 		ChSharedPtr<ChAssetLevel> vlevel (new  ChAssetLevel() );
 		ChSharedPtr<ChTriangleMeshShape> vshape (new ChTriangleMeshShape() );
@@ -165,65 +165,48 @@ int main(int argc, char* argv[])
 	rockerBody->SetMass(1); // to set
 	rockerBody->SetInertiaXX(ChVector<>(0.154239195, 1.826093039, 1.807630708)); // to set: Jzz in [gr*mm^2]
 
-	rockerBody->GetMaterialSurface()->SetFriction(0.1);
+	rockerBody->GetMaterialSurface()->SetFriction(0.1); //Rocker's COF
 
 	// Collision shape of the rockerBody
 
-	// ultimo punto rockerL: (originale, spigolo paletta interno sx) { -1.1358, -1.0897, -thickness }
+	// ultimo punto rockerL: (originale, spigolo paletta interno sx) { -0.9796, -0.7190, -thickness } ---> ultimo punto cambiato con { -0.9820, -0.7157, thickness } per avere angolo d'impulso paletta
+	                                                                                                     //sinistra pari a 0.5 gradi anzichè 0.9 originali   
 
 	std::vector < ChVector<> > points_rockerL = {
-			{ -1.2602, -1.1934, -thickness}, { -1.2752, -1.1774, -thickness}, { -1.2900, -1.1612, -thickness}, { -1.3047, -1.1446, -thickness}, { -1.3193, -1.1278, -thickness},
-			{ -1.3337, -1.1107, -thickness}, { -1.3480, -1.0933, -thickness}, { -1.3622, -1.0756, -thickness}, { -1.3762, -1.0575, -thickness}, { -1.3902, -1.0392, -thickness},
-			{ -1.4039, -1.0205, -thickness}, { -1.4176, -1.0014, -thickness}, { -1.4311, -0.9821, -thickness}, { -1.4444, -0.9624, -thickness}, { -1.4428, -0.9588, -thickness},
-			{ -1.1358, -1.0897, -thickness }, { -1.2602, -1.1934, thickness }, { -1.2752, -1.1774, thickness }, { -1.2900, -1.1612, thickness }, { -1.3047, -1.1446, thickness }, 
-			{ -1.3193, -1.1278, thickness },
-			{ -1.3337, -1.1107, thickness }, { -1.3480, -1.0933, thickness }, { -1.3622, -1.0756, thickness }, { -1.3762, -1.0575, thickness }, { -1.3902, -1.0392, thickness },
-			{ -1.4039, -1.0205, thickness }, { -1.4176, -1.0014, thickness }, { -1.4311, -0.9821, thickness }, { -1.4444, -0.9624, thickness }, { -1.4428, -0.9588, thickness },
-			{ -1.1358, -1.0897, thickness }
+			{ -1.1158, -0.8062, -thickness}, { -1.1292, -0.7874, -thickness}, { -1.1424, -0.7681, -thickness}, { -1.1554, -0.7484, -thickness}, { -1.1681, -0.7283, -thickness},
+			{ -1.1807, -0.7078, -thickness}, { -1.1931, -0.6867, -thickness}, { -1.2052, -0.6652, -thickness}, { -1.2171, -0.6431, -thickness}, { -1.2288, -0.6206, -thickness},
+			{ -1.2228, -0.6076, -thickness }, { -0.9820, -0.7157, -thickness }, { -1.1158, -0.8062, thickness }, { -1.1292, -0.7874, thickness }, { -1.1424, -0.7681, thickness },
+			{ -1.1554, -0.7484, thickness }, { -1.1681, -0.7283, thickness },
+			{ -1.1807, -0.7078, thickness }, { -1.1931, -0.6867, thickness }, { -1.2052, -0.6652, thickness }, { -1.2171, -0.6431, thickness }, { -1.2288, -0.6206, thickness },
+			{ -1.2228, -0.6076, thickness }, { -0.9820, -0.7157, thickness }
 	};
 	std::vector < ChVector<> > points_rockerR1 = {
-		    { 1.1492, -1.0752, -thickness}, { 1.1653, -1.0577, -thickness}, { 1.2690, -1.0758, -thickness}, { 1.2459, -1.2083, -thickness}, 
-			{ 1.1492, -1.0752, thickness }, { 1.1653, -1.0577, thickness }, { 1.2690, -1.0758, thickness }, { 1.2459, -1.2083, thickness }
+		    { 0.9908, -0.7028, -thickness}, { 1.0054, -0.6818, -thickness}, { 1.0936, -0.676, -thickness}, { 1.1034, -0.8231, -thickness}, 
+			{ 0.9908, -0.7028, thickness }, { 1.0054, -0.6818, thickness }, { 1.0936, -0.676, thickness }, { 1.1034, -0.8231, thickness }
 	};
 	std::vector < ChVector<> > points_rockerR2 = {
-		{ 1.1645, -1.0586, -thickness }, { 1.1802, -1.0410, -thickness }, { 1.2723, -1.0571, -thickness }, { 1.2689, -1.0768, -thickness },
-		{ 1.1645, -1.0586, thickness }, { 1.1802, -1.0410, thickness }, { 1.2723, -1.0571, thickness }, { 1.2689, -1.0768, thickness }
+		{ 1.0046, -0.6829, -thickness }, { 1.0186, -0.6619, -thickness }, { 1.0924, -0.6570, -thickness }, { 1.0937, -0.6770, -thickness },
+		{ 1.0046, -0.6829, thickness }, { 1.0186, -0.6619, thickness }, { 1.0924, -0.6570, thickness }, { 1.0937, -0.6770, thickness }
 	};
 	std::vector < ChVector<> > points_rockerR3 = {
-		{ 1.1794, -1.0419, -thickness }, { 1.1948, -1.0243, -thickness }, { 1.2756, -1.0384, -thickness }, { 1.2721, -1.0581, -thickness },
-		{ 1.1794, -1.0419, thickness }, { 1.1948, -1.0243, thickness }, { 1.2756, -1.0384, thickness }, { 1.2721, -1.0581, thickness }
+		{ 1.0179, -0.6630, -thickness }, { 1.0312, -0.6420, -thickness }, { 1.0911, -0.6381, -thickness }, { 1.0924, -0.6580, -thickness },
+		{ 1.0179, -0.6630, thickness }, { 1.0312, -0.6420, thickness }, { 1.0911, -0.6381, thickness }, { 1.0924, -0.6580, thickness }
 	};
 	std::vector < ChVector<> > points_rockerR4 = {
-		{ 1.1940, -1.0251, -thickness }, { 1.2090, -1.0075, -thickness }, { 1.2788, -1.0197, -thickness }, { 1.2754, -1.0394, -thickness },
-		{ 1.1940, -1.0251, thickness }, { 1.2090, -1.0075, thickness }, { 1.2788, -1.0197, thickness }, { 1.2754, -1.0394, thickness }
+		{ 1.0306, -0.6431, -thickness }, { 1.0433, -0.6222, -thickness }, { 1.0898, -0.6191, -thickness }, { 1.0912, -0.6391, -thickness },
+		{ 1.0306, -0.6431, thickness }, { 1.0433, -0.6222, thickness }, { 1.0898, -0.6191, thickness }, { 1.0912, -0.6391, thickness }
 	};
 	std::vector < ChVector<> > points_rockerR5 = {
-		{ 1.2082, -1.0083, -thickness }, { 1.2228, -0.9906, -thickness }, { 1.2821, -1.0010, -thickness }, { 1.2787, -1.0207, -thickness },
-		{ 1.2082, -1.0083, thickness }, { 1.2228, -0.9906, thickness }, { 1.2821, -1.0010, thickness }, { 1.2787, -1.0207, thickness }
+		{ 1.0427, -0.6232, -thickness }, { 1.0549, -0.6024, -thickness }, { 1.0886, -0.6002, -thickness }, { 1.0899, -0.6201, -thickness },
+		{ 1.0427, -0.6232, thickness }, { 1.0549, -0.6024, thickness }, { 1.0886, -0.6002, thickness }, { 1.0899, -0.6201, thickness }
 	};
 	std::vector < ChVector<> > points_rockerR6 = {
-		{ 1.2221, -0.9915, -thickness }, { 1.2363, -0.9737, -thickness }, { 1.2854, -0.9822, -thickness }, { 1.2819, -1.0019, -thickness },
-		{ 1.2221, -0.9915, thickness }, { 1.2363, -0.9737, thickness }, { 1.2854, -0.9822, thickness }, { 1.2819, -1.0019, thickness }
+		{ 1.0543, -0.6034, -thickness }, { 1.0659, -0.5826, -thickness }, { 1.0873, -0.5812, -thickness }, { 1.0887, -0.6011, -thickness },
+		{ 1.0543, -0.6034, thickness }, { 1.0659, -0.5826, thickness }, { 1.0873, -0.5812, thickness }, { 1.0887, -0.6011, thickness }
 	};
 	std::vector < ChVector<> > points_rockerR7 = {
-		{ 1.2356, -0.9746, -thickness }, { 1.2495, -0.9567, -thickness }, { 1.2887, -0.9635, -thickness }, { 1.2852, -0.9832, -thickness },
-		{ 1.2356, -0.9746, thickness }, { 1.2495, -0.9567, thickness }, { 1.2887, -0.9635, thickness }, { 1.2852, -0.9832, thickness }
-	};
-	std::vector < ChVector<> > points_rockerR8 = {
-		{ 1.2488, -0.9576, -thickness }, { 1.2624, -0.9396, -thickness }, { 1.2919, -0.9448, -thickness }, { 1.2885, -0.9645, -thickness },
-		{ 1.2488, -0.9576, thickness }, { 1.2624, -0.9396, thickness }, { 1.2919, -0.9448, thickness }, { 1.2885, -0.9645, thickness }
-	};
-	std::vector < ChVector<> > points_rockerR9 = {
-		{ 1.2617,-0.9405, -thickness }, { 1.2749, -0.9225, -thickness }, { 1.2952, -0.9261, -thickness }, { 1.2918, -0.9458, -thickness },
-		{ 1.2617,-0.9405, thickness }, { 1.2749, -0.9225, thickness }, { 1.2952, -0.9261, thickness }, { 1.2918, -0.9458, thickness }
-	};
-	std::vector < ChVector<> > points_rockerR10 = {
-		{ 1.2743, -0.9234, -thickness }, { 1.2872, -0.9054, -thickness }, { 1.2985, -0.9074, -thickness }, { 1.2950, -0.9271, -thickness },
-		{ 1.2743, -0.9234, thickness }, { 1.2872, -0.9054, thickness }, { 1.2985, -0.9074, thickness }, { 1.2950, -0.9271, thickness }
-	};
-	std::vector < ChVector<> > points_rockerR11 = {
-		{ 1.2865, -0.9063, -thickness }, { 1.2991, -0.8882, -thickness }, { 1.3018, -0.8887, -thickness }, { 1.2983, -0.9084, -thickness },
-		{ 1.2865, -0.9063, thickness }, { 1.2991, -0.8882, thickness }, { 1.3018, -0.8887, thickness }, { 1.2983, -0.9084, thickness }
+		{ 1.0654, -0.5837, -thickness }, { 1.0765, -0.5629, -thickness }, { 1.0861, -0.5622, -thickness }, { 1.0874, -0.5822, -thickness },
+		{ 1.0654, -0.5837, thickness }, { 1.0765, -0.5629, thickness }, { 1.0861, -0.5622, thickness }, { 1.0874, -0.5822, thickness }
 	};
 
 	rockerBody->GetCollisionModel()->SetSafeMargin(0.001); 
@@ -238,10 +221,6 @@ int main(int argc, char* argv[])
 	rockerBody->GetCollisionModel()->AddConvexHull(points_rockerR5, ChVector<>(0, 0, 0));
 	rockerBody->GetCollisionModel()->AddConvexHull(points_rockerR6, ChVector<>(0, 0, 0));
 	rockerBody->GetCollisionModel()->AddConvexHull(points_rockerR7, ChVector<>(0, 0, 0));
-	rockerBody->GetCollisionModel()->AddConvexHull(points_rockerR8, ChVector<>(0, 0, 0));
-	rockerBody->GetCollisionModel()->AddConvexHull(points_rockerR9, ChVector<>(0, 0, 0));
-	rockerBody->GetCollisionModel()->AddConvexHull(points_rockerR10, ChVector<>(0, 0, 0));
-	rockerBody->GetCollisionModel()->AddConvexHull(points_rockerR11, ChVector<>(0, 0, 0));
 	rockerBody->GetCollisionModel()->BuildModel();
 	rockerBody->SetCollide(true);
 
@@ -281,22 +260,6 @@ int main(int argc, char* argv[])
 	collision::ChConvexHullLibraryWrapper lhR7;
 	lhR7.ComputeHull(points_rockerR7, vshapeR7->GetMesh());
 	rockerBody->AddAsset(vshapeR7);
-	ChSharedPtr<ChTriangleMeshShape> vshapeR8(new ChTriangleMeshShape());
-	collision::ChConvexHullLibraryWrapper lhR8;
-	lhR8.ComputeHull(points_rockerR8, vshapeR8->GetMesh());
-	rockerBody->AddAsset(vshapeR8);
-	ChSharedPtr<ChTriangleMeshShape> vshapeR9(new ChTriangleMeshShape());
-	collision::ChConvexHullLibraryWrapper lhR9;
-	lhR9.ComputeHull(points_rockerR9, vshapeR9->GetMesh());
-    rockerBody->AddAsset(vshapeR9);
-	ChSharedPtr<ChTriangleMeshShape> vshapeR10(new ChTriangleMeshShape());
-	collision::ChConvexHullLibraryWrapper lhR10;
-	lhR10.ComputeHull(points_rockerR10, vshapeR10->GetMesh());
-	rockerBody->AddAsset(vshapeR10);
-	ChSharedPtr<ChTriangleMeshShape> vshapeR11(new ChTriangleMeshShape());
-	collision::ChConvexHullLibraryWrapper lhR11;
-	lhR11.ComputeHull(points_rockerR11, vshapeR11->GetMesh());
-	rockerBody->AddAsset(vshapeR11);
 
 
 	// optional visualization
@@ -471,7 +434,7 @@ int main(int argc, char* argv[])
 
 		application.EndScene();
 
-		if (mphysicalSystem.GetChTime() > 1) 
+		if (mphysicalSystem.GetChTime() > 2) 
 			break;
 
 	}
